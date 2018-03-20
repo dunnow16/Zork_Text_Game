@@ -1,16 +1,18 @@
 #!usr/bin/env python3
 
 from c_functions.getch import _Getch
+from objects.game import Game
 from observer_pattern.observer import Observer
 from observer_pattern.observable import Observable
-from objects.house import House
 from objects.neighborhood import Neighborhood
+from objects.house import House
 import objects.house
-from objects.npc import Monster
+from objects.npc import Npc
 import objects.weapon
 
+
 if __name__ == "__main__":
-    '''
+    """
     Author: Owen Dunn
     Date:   3/19/18
     
@@ -24,14 +26,8 @@ if __name__ == "__main__":
     health (hitpoints) and attack level. You must clear a house of all 
     monsters before moving to a different house. Use 'w' to go north 
     one house, 'a' to go west, 'd' to go east, and 's' to go south.
-    '''
-    
-    ch = ' ' # character used to make movement choices
-    getch = _Getch() # allow single-key input
-    h = House()
-    vampire = Monster()
-    mummy = Monster()
-    
+    """
+
     print('===========================ZORK===========================')
     print(' ')
     print('A 5x5 neighborhood of houses has a problem. People have')
@@ -47,14 +43,13 @@ if __name__ == "__main__":
     print('')
     print('Controls:') 
     print('1) Movement: w-North, a-West, s-South, d-East')
-    print('2) Weapon Choice: 1-Hershey Kisses, 2-SourStraws,')
-    print('                  3-ChocolateBars,  4-NerdBombs')
-    
-    vampire.add_observer(h)
-    mummy.add_observer(h)
-    
-    vampire.updateObservable()
-    mummy.updateObservable()
-    #ch = getch.__call__() # read a single char input
-    #print(ch)
-    
+    print('2) Weapon Choice: 1-Hershey Kisses, 2-Sour Straws,')
+    print('                  3-Chocolate Bars, 4-Nerd Bombs')
+
+    ch = ' '  # character used to make movement choices
+    getch = _Getch()  # allow single-key input
+    # create game object to host neighborhood with houses, npcs, ...
+    game = Game()
+
+    # ch = getch.__call__() # read a single char input
+    # print(ch)

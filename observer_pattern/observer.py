@@ -2,9 +2,10 @@
 
 from abc import ABCMeta, abstractmethod
 
+
 class Observer(object):
     __metaclass__ = ABCMeta
   
     @abstractmethod
-    def updateObserver(self):
+    def update_observer(self):
         pass
