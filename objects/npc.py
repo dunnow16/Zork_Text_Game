@@ -2,6 +2,7 @@
 
 from observer_pattern.observable import Observable
 from observer_pattern.observer import Observer
+from objects.weapon import Weapon
 import random
 
 
@@ -41,20 +42,42 @@ class Player(Npc, Observer):
     can hold 10 weapons at a time.
     """
 
-    num_weapons = 0
+    # How many weapons the player starts with.
+    num_start_weapons = 10
 
     def __init__(self):
         """Initializes the player."""
         super().__init__(random.randint(100, 125),  # Health
                          random.randint(10, 20))    # Attack
-        self.num_weapons = 0  # total weapons
-        # TODO add 10 random weapons
-        for i in range(9):
-            self.__weapons = []
+        self.__num_weapons = 0  # total weapons
+        self.__weapons = []     # player weapon inventory
+        # add 10 random weapons to player
+        self.__create_start_weapons(Player.num_start_weapons)
 
     def update_observer(self):  # TODO make observer?
         """Update the player when the game """
         pass
+
+    def __create_start_weapons(self, n):
+        """
+        Used to create the weapons the player starts the game with.
+        """
+
+        # Create n weapons and add to player's inventory.
+        for i in range(n):
+            # Create one of the 4 weapons (0-3) randomly and add to the
+            # players inventory.
+            wid = random.randrange(Weapon.num_unique)
+            self.__weapons.append(Weapon(wid))
+
+
+    def get_num_weapons(self):
+        """Returns the number of weapons the player has."""
+        return len(self.__weapons)
+
+    def get_weapons(self):
+        """Returns the weapon inventory for the player"""
+        return self.__weapons
 
 
 class Monster(Npc, Observable):
