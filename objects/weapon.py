@@ -52,13 +52,13 @@ class Weapon(object):
             elif wid == 1:  # SourStraws: 1 - 1.75
                 # Choose random multiplier from 1 to 1.75 in increments
                 # of 0.05.
-                self.__mult = random.randrange(1.00, 1.80, 0.05)
+                self.__mult = random.uniform(1.00, 1.75)
             elif wid == 2:  # ChocolateBars: 2 - 2.4
-                self.__mult = random.randrange(2.00, 2.45, 0.05)
+                self.__mult = random.uniform(2.00, 2.40)
             elif wid == 3:  # NerdBombs: 3.5 - 5
-                self.__mult = random.randrange(3.50, 5.05, 0.05)
+                self.__mult = random.uniform(3.50, 5.00)
         else:
-            return -1
+            return -1  # error code
 
         return 0
 
@@ -68,11 +68,32 @@ class Weapon(object):
 
     def get_uses(self):
         """Returns the number of uses the weapon has left."""
-        if self.name == "HersheyKisses":  # unlimited use
+
+        if self.get_name() == "HersheyKisses":  # unlimited use
             return 1
 
         return self.__num_uses
 
+    def get_name(self):
+        """
+        Gets the non-print friendly name for a weapon used in the code.
+        """
+        return self.__name
+
+    def print_name(self):
+        """Prints the weapon name."""
+        if self.__name in Weapon.valid_names:
+            print(Weapon.valid_names[self.__name])
+        else:
+            print("Error: Weapon not found!")
+
     def use_weapon(self):
         """Defines what happens when a weapon is used."""
+
+        if self.__wid == 0:  # unlimited uses for Hershey Kisses
+            return
+        elif self.__wid not in Weapon.weapon_id:
+            return
         self.__num_uses = self.__num_uses - 1  # reduce uses count by 1
+
+

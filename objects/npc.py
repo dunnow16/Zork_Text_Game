@@ -63,13 +63,16 @@ class Player(Npc, Observer):
         Used to create the weapons the player starts the game with.
         """
 
+        # First add the unlimited weapon
+        self.__weapons.append(Weapon(0))
+
         # Create n weapons and add to player's inventory.
         for i in range(n):
-            # Create one of the 4 weapons (0-3) randomly and add to the
-            # players inventory.
-            wid = random.randrange(Weapon.num_unique)
-            self.__weapons.append(Weapon(wid))
-
+            # Create one of the 3 weapons (1-3) randomly and add to the
+            # players inventory. (not unlimited use weapon)
+            wid = random.randint(1, Weapon.num_unique)
+            weapon = Weapon(wid)
+            self.__weapons.append(weapon)
 
     def get_num_weapons(self):
         """Returns the number of weapons the player has."""
@@ -85,6 +88,10 @@ class Monster(Npc, Observable):
     Monster object: Used as a parent to create all monster types. This
     class is only used as a base class to create other monster classes.
     """
+
+    # The total monsters that exist. Not including cured humans.
+    total_monsters = 0
+
     def __init__(self, h, s, m):
         """Initialize a generic monster."""
         super().__init__(h, s)
@@ -93,6 +100,8 @@ class Monster(Npc, Observable):
         # self.weakness = []  # weapons weak to
         # self.weak_mult = m  # multiplier of damage for weakness weapons
         self.__mult = m  # damage multiplier dictionary
+        # Update the created monster count.
+        Monster.total_monsters = Monster.total_monsters + 1
 
     # def update_observable(self):
     #     """
@@ -113,6 +122,27 @@ class Monster(Npc, Observable):
             return 0
         else:
             return self.__mult[weapon]
+
+    @staticmethod
+    def get_total_monsters():
+        """
+        Static method that returns the total monsters that exist. Does
+        not count monsters that have returned to being human.
+
+        :return: total monsters
+        """
+        return Monster.total_monsters
+
+    @staticmethod
+    def __decrement_monster_count():
+        """
+        Static method to reduce the count of monsters.
+        :return: none
+        """
+
+        if Monster.get_total_monsters() <= 0:  # should have won by now
+            return
+        Monster.total_monsters = Monster.total_monsters - 1
 
 
 class Zombie(Monster):
@@ -161,4 +191,21 @@ class Werewolf(Monster):
                      'ChocolateBars': 0, 'NerdBombs': 1}
         super().__init__(200,                    # Health
                          random.randint(0, 40),  # Attack
+                         self.mult)
+
+
+class Person(Monster):
+    """
+    Person object: A helpful 'monster' type.
+    When a person is created, a monster was just transformed into the
+    person. People heal the player by 1 health point per turn.
+    The game is won when all monsters are transformed into people.
+    """
+    def __init__(self):
+        """Initialize the person NPC."""
+        # People are immune to everything.
+        self.mult = {'HersheyKisses': 0, 'SourStraws': 0,
+                     'ChocolateBars': 0, 'NerdBombs': 0}
+        super().__init__(100,   # Health
+                         -1,    # Attack (they heal player)
                          self.mult)

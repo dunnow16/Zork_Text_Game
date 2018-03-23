@@ -38,5 +38,9 @@ class Neighborhood(object):
         return self.__cols
 
     def get_total_monsters(self):
-        """Return the total number of monsters in neighborhood."""
+        """
+        Return the total number of monsters in neighborhood.
+
+        :return: total monsters in neighborhood
+        """
         return self.__total_monsters

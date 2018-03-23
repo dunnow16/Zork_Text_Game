@@ -2,6 +2,7 @@
 
 from c_functions.getch import _Getch
 from objects.game import Game
+from objects.npc import Player
 from observer_pattern.observer import Observer
 from observer_pattern.observable import Observable
 from objects.neighborhood import Neighborhood
@@ -48,8 +49,8 @@ if __name__ == "__main__":
 
     ch = ' '  # character used to make movement choices
     getch = _Getch()  # allow single-key input
-    # create game object to host neighborhood with houses, npcs, ...
-    game = Game()
+    # create game object to host neighborhood and player objects
+    g = Game()
 
     # ch = getch.__call__() # read a single char input
     # print(ch)
