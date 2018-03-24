@@ -47,10 +47,6 @@ if __name__ == "__main__":
     print('2) Weapon Choice: 1-Hershey Kisses, 2-Sour Straws,')
     print('                  3-Chocolate Bars, 4-Nerd Bombs')
 
-    ch = ' '  # character used to make movement choices
-    getch = _Getch()  # allow single-key input
     # create game object to host neighborhood and player objects
     g = Game()
-
-    # ch = getch.__call__() # read a single char input
-    # print(ch)
+    g.play()  # play the game

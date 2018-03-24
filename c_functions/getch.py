@@ -1,5 +1,6 @@
 #!usr/bin/env python3
 
+
 class _Getch:
     """
     All code in this file from:
@@ -18,6 +19,7 @@ class _Getch:
 
 
 class _GetchUnix:
+    """Works on EOS Centos, Linux system."""
     def __init__(self):
         import tty, sys
 
@@ -34,9 +36,16 @@ class _GetchUnix:
 
 
 class _GetchWindows:
-    def __init__(self):
-        import msvcrt
+    """
+    This code doesn't seem to work on Windows 10.
+    """
+    # def __init__(self):
+    #     import msvcrt
+    #
+    # def __call__(self):
+    #     import msvcrt
+    #     return msvcrt.getch()
 
-    def __call__(self):
-        import msvcrt
-        return msvcrt.getch()
+    def __call__(self):  # for win10 testing
+        ch = input('')
+        return ch

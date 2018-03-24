@@ -30,17 +30,42 @@ class Neighborhood(object):
                 self.__neighborhood[i][j] = House()
 
     def get_rows(self):
-        """Returns the number of rows in neighborhood."""
+        """
+        Returns the number of rows in neighborhood.
+        :return rows: total rows in the neighborhood
+        """
         return self.__rows
 
     def get_cols(self):
-        """Returns the number of columns in neighborhood."""
+        """
+        Returns the number of columns in neighborhood.
+        :return columns: total columns in the neighborhood
+        """
         return self.__cols
 
     def get_total_monsters(self):
         """
         Return the total number of monsters in neighborhood.
 
-        :return: total monsters in neighborhood
+        :return __total_monsters: total monsters in neighborhood
         """
         return self.__total_monsters
+
+    def get_house_loc(self, x, y):
+        """
+        This function returns a house object at location (x,y) in the
+        neighborhood array.
+
+        :param x: house row
+        :param y: house column
+        :return House(): the house at location (x,y) in the neighborhood
+        array
+        """
+
+        # Check if within the bounds of the neighborhood.
+        if 0 <= x < self.__rows:
+            if 0 <= y < self.__cols:
+                return self.__neighborhood[x][y]
+
+        print('Invalid location: No house returned.')
+        return -1

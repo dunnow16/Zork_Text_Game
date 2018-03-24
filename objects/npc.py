@@ -22,7 +22,7 @@ class Npc(object):
         """Returns the current NPC health points (hp)."""
         return self.__hp
 
-    def __set_hp(self, hp):
+    def set_hp(self, hp):
         """Set the npc health points."""
         self.__hp = hp
 
@@ -67,10 +67,10 @@ class Player(Npc, Observer):
         self.__weapons.append(Weapon(0))
 
         # Create n weapons and add to player's inventory.
-        for i in range(n):
+        for i in range(n - 1):  # add 9 more random weapons
             # Create one of the 3 weapons (1-3) randomly and add to the
             # players inventory. (not unlimited use weapon)
-            wid = random.randint(1, Weapon.num_unique)
+            wid = random.randint(1, Weapon.num_unique - 1)
             weapon = Weapon(wid)
             self.__weapons.append(weapon)
 
@@ -82,6 +82,44 @@ class Player(Npc, Observer):
         """Returns the weapon inventory for the player"""
         return self.__weapons
 
+    def select_weapon(self, wid):
+        """
+        The function returns a weapon from the player's list of weapons.
+        If it is discovered that the selected weapon is not in the
+        player's inventory, then the one weapon with unlimited uses will
+        be returned.
+        :param wid: the weapons id that's used to select a weapon from
+        the weapons list
+        :return: Weapon(): a weapon object from the list of weapons
+        """
+        for w in self.__weapons:
+            if w.get_id() == wid:  # take the first found of wanted type
+                # Reduce the number of uses by 1.
+                w.use_weapon()
+                return w  # we have what we need
+        # return hershey kisses if not found
+        return self.__weapons[0]
+
+    def remove_weapon(self, weapon):
+        """
+        This function removes the passed weapon from the player's
+        inventory
+        :param weapon: Weapon(): object
+        :return: none
+        """
+        if weapon in self.__weapons:
+            self.__weapons.remove(weapon)
+
+    def player_defence(self):  # todo
+        """
+        This function describes what happens when the player is
+        attacked. The player is attacked by all the monsters in
+        succession in the current house.
+        :param
+        :return:
+        """
+        pass
+
 
 class Monster(Npc, Observable):
     """
@@ -91,10 +129,15 @@ class Monster(Npc, Observable):
 
     # The total monsters that exist. Not including cured humans.
     total_monsters = 0
+    # Allows identification for the monsters.
+    monster_id = {0: 'Zombie', 1: 'Vampire', 2: 'Ghoul', 3: 'Werewolf',
+                  4: 'Person'}
 
     def __init__(self, h, s, m):
         """Initialize a generic monster."""
         super().__init__(h, s)
+        # Create an observer list for the monster.
+        Observable.__init__(self)
         # self.monster_type = monster_type  # type of monster
         # self.immume = []    # weapons immune to
         # self.weakness = []  # weapons weak to
@@ -118,10 +161,10 @@ class Monster(Npc, Observable):
 
         # Check if weapon is in the dictionary. If not, return 0.
         # If found, return the multiplier.
-        if weapon not in self.__mult:
+        if weapon.get_name() not in self.__mult:
             return 0
         else:
-            return self.__mult[weapon]
+            return self.__mult[weapon.get_name()]
 
     @staticmethod
     def get_total_monsters():
@@ -129,7 +172,7 @@ class Monster(Npc, Observable):
         Static method that returns the total monsters that exist. Does
         not count monsters that have returned to being human.
 
-        :return: total monsters
+        :return: total_monsters: total monsters that exist
         """
         return Monster.total_monsters
 
@@ -144,6 +187,30 @@ class Monster(Npc, Observable):
             return
         Monster.total_monsters = Monster.total_monsters - 1
 
+    def monster_defence(self, weapon, attack):
+        """
+        This function defines what happens when a monster is attacked.
+        :param: weapon: Weapon() object
+        :param: attack: raw attack value
+        :return: none
+        """
+        # Calculate the damage from player's weapon.
+        damage = self.get_multiplier(weapon) * attack * weapon.get_mult()
+        print(self.get_multiplier(weapon))
+        print(attack)
+        print(weapon.get_mult())
+        health = self.get_hp() - damage
+        self.set_hp(health)
+        if health <= 0:
+            print('%s defeated! It became a helpful human!'
+                  % (Monster.monster_id[self.get_id()]))
+            Monster.__decrement_monster_count()
+            # Update all houses watching of a monster purified.
+            self.update_observable()
+        else:
+            print("%s hit for %.1f damage, now at %.1f health points."
+                  % (Monster.monster_id[self.get_id()], damage, health))
+
 
 class Zombie(Monster):
     """Zombie object: The weakest monster type."""
@@ -153,9 +220,17 @@ class Zombie(Monster):
         # damage multiplier dictionary for zombie
         self.mult = {'HersheyKisses': 1, 'SourStraws': 2,
                      'ChocolateBars': 1, 'NerdBombs': 1}
+        self.__id = 0
         super().__init__(random.randint(50, 100),  # Health
                          random.randint(0, 10),    # Attack
                          self.mult)
+
+    def get_id(self):
+        """
+        Returns the monster's id.
+        :return: id: the monster's id number
+        """
+        return self.__id
 
 
 class Vampire(Monster):
@@ -165,9 +240,17 @@ class Vampire(Monster):
         # damage multiplier dictionary
         self.mult = {'HersheyKisses': 1, 'SourStraws': 1,
                      'ChocolateBars': 0, 'NerdBombs': 1}
+        self.__id = 1
         super().__init__(random.randint(100, 200),  # Health
                          random.randint(10, 20),    # Attack
                          self.mult)
+
+    def get_id(self):
+        """
+        Returns the monster's id.
+        :return: id: the monster's id number
+        """
+        return self.__id
 
 
 class Ghoul(Monster):
@@ -177,9 +260,17 @@ class Ghoul(Monster):
         # damage multiplier dictionary
         self.mult = {'HersheyKisses': 1, 'SourStraws': 1,
                      'ChocolateBars': 1, 'NerdBombs': 5}
+        self.__id = 2
         super().__init__(random.randint(40, 80),  # Health
                          random.randint(15, 30),  # Attack
                          self.mult)
+
+    def get_id(self):
+        """
+        Returns the monster's id.
+        :return: id: the monster's id number
+        """
+        return self.__id
 
 
 class Werewolf(Monster):
@@ -189,9 +280,17 @@ class Werewolf(Monster):
         # damage multiplier dictionary
         self.mult = {'HersheyKisses': 1, 'SourStraws': 0,
                      'ChocolateBars': 0, 'NerdBombs': 1}
+        self.__id = 3
         super().__init__(200,                    # Health
                          random.randint(0, 40),  # Attack
                          self.mult)
+
+    def get_id(self):
+        """
+        Returns the monster's id.
+        :return: id: the monster's id number
+        """
+        return self.__id
 
 
 class Person(Monster):
@@ -206,6 +305,14 @@ class Person(Monster):
         # People are immune to everything.
         self.mult = {'HersheyKisses': 0, 'SourStraws': 0,
                      'ChocolateBars': 0, 'NerdBombs': 0}
+        self.__id = 4
         super().__init__(100,   # Health
                          -1,    # Attack (they heal player)
                          self.mult)
+
+    def get_id(self):
+        """
+        Returns the monster's id.
+        :return: id: the monster's id number
+        """
+        return self.__id
