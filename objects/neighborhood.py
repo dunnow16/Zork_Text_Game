@@ -19,7 +19,12 @@ class Neighborhood(object):
         self.__total_monsters = 0
 
     def create_neighborhood(self):
-        """Create a random neighborhood."""
+        """
+        Create a random neighborhood. A grid of houses are created with
+        a random number of monsters in each house. As each house is
+        created, the game object is added as an observer.
+        :return: none
+        """
         if len(self.__neighborhood) > 0:  # if list not empty
             self.__neighborhood.clear()  # delete old neighborhood
         self.__neighborhood = \
@@ -27,7 +32,8 @@ class Neighborhood(object):
              for j in range(self.__rows)]
         for i in range(self.__rows):
             for j in range(self.__cols):
-                self.__neighborhood[i][j] = House()
+                h = House()
+                self.__neighborhood[i][j] = h
 
     def get_rows(self):
         """

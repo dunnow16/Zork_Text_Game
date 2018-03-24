@@ -2,6 +2,7 @@
 
 from observer_pattern.observer import Observer
 from observer_pattern.observable import Observable
+from objects.npc import Monster
 from objects.npc import Zombie
 from objects.npc import Vampire
 from objects.npc import Ghoul
@@ -27,10 +28,28 @@ class House(Observer, Observable):
         self.__create_monsters()
         Observable.__init__(self)
 
+    def update_observer(self):
+        """
+        The house updates when a monster is purified. The count of
+        monsters is decreased and a person is added to the house in the
+        monster's place.
+        :return: none
+        """
+        # Remove any monsters with health <= 0.
+        for m in self.__monsters:
+            if m.get_hp() <= 0:
+                self.__monsters.remove(m)
+                self.__house_monsters = self.__house_monsters - 1
+                # Now add a person to replace the monster.
+                person = Person()
+                self.__monsters.append(person)
+                # Update the game object observing.
+                self.update_observable()
+
     def __create_monsters(self):
         """
         This function creates the monsters for the house.
-        :return
+        :return: none
         """
         # The number of types of monsters.
         monster_types = 4
@@ -56,32 +75,16 @@ class House(Observer, Observable):
     def get_house_monsters(self):
         """
         Returns the total monster count in the house.
-        :return __total_monsters
+        :return: __total_monsters: total monsters in the house
         """
         return self.__house_monsters
 
-    def update_observer(self):
-        """
-        The house updates when a monster is purified. The count of
-        monsters is decreased and a person is added to the house in the
-        monster's place.
-        :return none
-        """
-        # Remove any monsters with health <= 0.
-        for m in self.__monsters:
-            if m.get_hp() <= 0:
-                self.__monsters.remove(m)
-                self.__house_monsters = self.__house_monsters - 1
-                # Now add a person to replace the monster.
-                person = Person()
-                self.__monsters.append(person)
-
-    def update_observable(self):
-        """
-        The house lets the game know that a monster
-        :return:
-        """
-        print('Population updated!')
+    # def update_observable(self):
+    #     """
+    #     The house lets the game know that a monster
+    #     :return: none
+    #     """
+    #     print('Population updated!')
 
     # def enter(self):
     #     """
@@ -97,9 +100,9 @@ class House(Observer, Observable):
         """
         This functions describes what happens when the player attacks
         all the monsters in the house.
-        :param weapon: Weapon() object
-        :param attack: raw damage done by player
-        :return none
+        :param: weapon: Weapon() object
+        :param: attack: raw damage done by player
+        :return: none
         """
 
         # Go through the list of monsters and attack each one with a
@@ -108,3 +111,20 @@ class House(Observer, Observable):
         for m in self.__monsters:
             # Calculate damage and update statistics for monster.
             m.monster_defence(weapon, attack)
+
+    def player_defence(self, player):
+        """
+        This method describes what happens when the player is attacked
+        by all the monsters in the house in succession.
+        :param: player: Player() object
+        :return: none
+        """
+        # Attack player with each monster.
+        for m in self.__monsters:
+            damage = m.get_strength()
+            health = player.get_hp() - damage
+            player.set_hp(health)
+            if health <= 0:  # Game Over
+                return
+            print('A %s attacks! You take %.1f damage. HP = %.1f' %
+                  (Monster.monster_id[m.get_id()], damage, health))

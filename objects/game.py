@@ -17,7 +17,8 @@ class Game(Observer):
     def __init__(self):
         """Class initializer code."""
         self.__n = Neighborhood()
-        self.__total_monsters = 0
+        # The total monster objects created found in the Monster class.
+        self.__total_monsters = Monster.total_monsters
         self.__posx = 0  # house x coordinate
         self.__posy = 0  # house y coordinate
         self.__player = Player()  # create player character
@@ -26,8 +27,16 @@ class Game(Observer):
         print('Strength      = %d' % self.__player.get_strength())
     
     def update_observer(self):
-        """Observer update code. This object observes houses."""
-        pass
+        """
+        Observer update code. This object observes houses. Houses update
+        the game object when a monster is changed into a human. This
+        causes a decrement of the total monster count. The game is won
+        when there are no monsters left.
+        :return: none
+        """
+        self.__total_monsters = self.__total_monsters - 1
+        if self.__total_monsters <= 0:  # Winning condition
+            print('You Win!\nYour neighborhood is now safe.')
 
     def get_total_monsters(self):
         """Return the total number of monsters in neighborhood."""
@@ -56,8 +65,10 @@ class Game(Observer):
         # drops to 0.
         print('You wake up in your house at (0,0).')
         print('You must cure your family first before you can move on.')
+
         # start game at (0,0) house
         h = self.__n.get_house_loc(x, y)
+
         # Add the game object as an observer of the house.
         h.add_observer(self)
         if h == -1:
@@ -73,18 +84,29 @@ class Game(Observer):
                 while ch not in '1234':
                     print('Please enter a valid character: ')
                     ch = getch.__call__()  # read a single char input
-                wid = ord(ch)  # get weapon id from character
+                wid = int(ch)  # get weapon id from character
+
                 # get weapon from inventory
                 w = self.__player.select_weapon(wid - 1)
+
                 # Find how much raw damage is done by the player.
                 attack = self.__player.get_strength()
+
                 # The player attacks all monsters.
                 h.player_attack(w, attack)
+
                 # Check if the weapon had its last use.
                 if w.get_uses() <= 0:
                     self.__player.remove_weapon(w)
+
                 # The player is attacked by all monsters.
-                self.__player.player_defence()
+                h.player_defence(self.__player)
+
+                # Check if game over condition met.
+                if self.__player.get_hp() <= 0:
+                    print('GAME OVER! :(\ntry again?')
+                    return
+
             print('House clear of monsters.')
             print('Make your next move (w,a,s,d): ')
             ch = getch.__call__()  # read a single char input
@@ -95,4 +117,29 @@ class Game(Observer):
                 if (x + 1) < self.__n.get_rows():  # if within bounds
                     x = x + 1  # Move up 1 house row.
                 else:  # This is out of bounds.
-                    print('')
+                    print('Out of bounds!')
+            if ch == 's':
+                if (x - 1) < 0:  # if within bounds
+                    x = x - 1  # Move up 1 house row.
+                else:  # This is out of bounds.
+                    print('Out of bounds!')
+            if ch == 'a':
+                if (y - 1) < 0:  # if within bounds
+                    y = y - 1  # Move up 1 house row.
+                else:  # This is out of bounds.
+                    print('Out of bounds!')
+            if ch == 'd':
+                if (y + 1) > self.__n.get_cols():  # if within bounds
+                    y = y + 1  # Move up 1 house row.
+                else:  # This is out of bounds.
+                    print('Out of bounds!')
+
+            # Go to the next house.
+            h = self.__n.get_house_loc(x, y)
+
+            # Add the game object as an observer of the house.
+            if h == -1:
+                print('Error: exiting game.')
+                return
+
+            h.add_observer(self)
