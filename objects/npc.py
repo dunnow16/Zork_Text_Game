@@ -68,10 +68,6 @@ class Player(Npc, Observer):
         # add 10 random weapons to player
         self.__create_start_weapons(Player.num_start_weapons)
 
-    def update_observer(self):  # TODO make observer?
-        """Update the player when the game """
-        pass
-
     def __create_start_weapons(self, n):
         """
         Used to create the weapons the player starts the game with.
@@ -131,18 +127,6 @@ class Player(Npc, Observer):
         """
         if weapon in self.__weapons:
             self.__weapons.remove(weapon)
-
-    def player_defence(self):  # todo
-        """
-        This function describes what happens when the player is
-        attacked. The player is attacked by all the monsters in
-        succession in the current house.
-        :param:
-        :return:
-        """
-        pass
-        # print('%s attacks for %.1f damage, your HP = %.1f' % /
-        #       )
 
 
 class Monster(Npc, Observable):

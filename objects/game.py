@@ -5,6 +5,7 @@ from objects.neighborhood import Neighborhood
 from objects.npc import Player
 from objects.npc import Monster
 from c_functions.getch import _Getch
+from objects.weapon import Weapon
 
 
 class Game(Observer):
@@ -88,6 +89,8 @@ class Game(Observer):
 
                 # get weapon from inventory
                 w = self.__player.select_weapon(wid - 1)
+                print('You attack with %s!' %
+                      Weapon.valid_names[w.get_name()])
 
                 # Find how much raw damage is done by the player.
                 attack = self.__player.get_strength()
@@ -98,41 +101,57 @@ class Game(Observer):
                 # Check if the weapon had its last use.
                 if w.get_uses() <= 0:
                     self.__player.remove_weapon(w)
+                    print('%s out of uses.' %
+                          Weapon.valid_names[w.get_name()])
 
                 # The player is attacked by all monsters.
                 h.player_defence(self.__player)
 
                 # Check if game over condition met.
                 if self.__player.get_hp() <= 0:
-                    print('GAME OVER! :(\ntry again?')
+                    print('\nGAME OVER! :(\ntry again?')
                     return
 
-            print('House clear of monsters.')
+            print('House clear of monsters.\n')
+            print('You find some untainted candy and restore your health.\n')
+            self.__player.set_hp(125)
+            # todo add some new weapons after each house?
             print('Make your next move (w,a,s,d): ')
             ch = getch.__call__()  # read a single char input
-            while ch not in 'wasd':
-                print('Please enter a valid character: ')
-                ch = getch.__call__()  # read a single char input
-            if ch == 'w':
-                if (x + 1) < self.__n.get_rows():  # if within bounds
-                    x = x + 1  # Move up 1 house row.
-                else:  # This is out of bounds.
-                    print('Out of bounds!')
-            if ch == 's':
-                if (x - 1) < 0:  # if within bounds
-                    x = x - 1  # Move up 1 house row.
-                else:  # This is out of bounds.
-                    print('Out of bounds!')
-            if ch == 'a':
-                if (y - 1) < 0:  # if within bounds
-                    y = y - 1  # Move up 1 house row.
-                else:  # This is out of bounds.
-                    print('Out of bounds!')
-            if ch == 'd':
-                if (y + 1) > self.__n.get_cols():  # if within bounds
-                    y = y + 1  # Move up 1 house row.
-                else:  # This is out of bounds.
-                    print('Out of bounds!')
+            valid = False
+            while ch not in 'wasd' or not valid:
+                while ch not in 'wasd':
+                    print('Please enter a valid character: ')
+                    ch = getch.__call__()  # read a single char input
+                if ch == 'w':
+                    # Check if within bounds for given direction.
+                    if (y + 1) < self.__n.get_rows():
+                        y = y + 1  # Move up 1 house row.
+                        valid = True
+                    else:  # This is out of bounds.
+                        print('Out of bounds!')
+                        ch = ' '
+                elif ch == 's':
+                    if (y - 1) >= 0:  # if within bounds
+                        y = y - 1  # Move up 1 house row.
+                        valid = True
+                    else:  # This is out of bounds.
+                        print('Out of bounds!')
+                        ch = ' '
+                elif ch == 'a':
+                    if (x - 1) >= 0:  # if within bounds
+                        x = x - 1  # Move up 1 house row.
+                        valid = True
+                    else:  # This is out of bounds.
+                        print('Out of bounds!')
+                        ch = ' '
+                elif ch == 'd':
+                    if (x + 1) < self.__n.get_cols():
+                        x = x + 1  # Move up 1 house row.
+                        valid = True
+                    else:  # This is out of bounds.
+                        print('Out of bounds!')
+                        ch = ' '
 
             # Go to the next house.
             h = self.__n.get_house_loc(x, y)
@@ -143,3 +162,4 @@ class Game(Observer):
                 return
 
             h.add_observer(self)
+            print('You enter house (%d, %d)\n' % (x, y))
